@@ -1,0 +1,8 @@
+# Cache, session files and logs
+/var/cache/*
+/var/logs/*
+/var/sessions/*
+
+# Vendor and PHPUnit
+/vendor/*
+/tmp/*
