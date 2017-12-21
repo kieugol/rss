@@ -2,9 +2,9 @@
 parameters:
     database_host: 127.0.0.1
     database_port: 3306
-    database_name: 8bit_trial
+    database_name: krol_8bit
     database_user: root
-    database_password: root
+    database_password: null
     mailer_transport: smtp
     mailer_host: null
     mailer_user: null

@@ -1,7 +1,7 @@
 <?php
 namespace AppBundle\Controller;
 
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 Use AppBundle\Entity\Feed;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -9,15 +9,35 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class RssController extends BaseController
 {
-    
-    public function listAction()
+    /**
+     * Show list items data of RSS and filter category name
+     *
+     * @param  Request $request   the object contains request parameters
+     * @return view               display page list items data
+     */
+    public function listAction(Request $request)
     {
-        // $em = $this->getDoctrine()->getManager();
-        // $allOurBlogPosts = $em->getRepository(Feed::class)->findAll();
-        // $paginator  = $this->get('knp_paginator');
-        // $blogPosts = $paginator->paginate($allOurBlogPosts, 2, 100);
+        $em = $this->getDoctrine()->getManager();
+        $queryBuilder = $em->getRepository(Feed::class)->createQueryBuilder('f');
+
+        $categoryFilter = trim($request->query->get('filter'));
+        if (!empty($categoryFilter)) {
+            $queryBuilder
+                ->where('f.category LIKE :param')
+                ->setParameter('param', '%' . $categoryFilter . '%');
+        }
+
+        $query = $queryBuilder->getQuery();
+
+        $paginator  = $this->get('knp_paginator');
+        $pagination = $paginator->paginate(
+            $query,
+            $request->query->getInt('page', 1),
+            $request->query->getInt('limit', 20)
+        );
         return $this->render('rss/index.html.twig', [ 
-           'items' => 'ok'
+           'list_item'  => $pagination,
+           'page_title' => 'list item'
         ]);
     }
 }

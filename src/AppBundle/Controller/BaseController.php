@@ -17,4 +17,16 @@ class BaseController  extends Controller
     {
         $this->logger = $this->get('logger');
     }
+
+    /**
+     * Show error page
+     *
+     * @return error view
+     */
+    protected function errorAction()
+    {
+        return $this->render('common/error.html.twig', [
+           'page_title' => 'page not found'
+        ]);
+    }
 }

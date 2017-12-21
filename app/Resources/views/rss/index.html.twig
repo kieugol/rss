@@ -1,93 +1,104 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Show item list{% endblock %}
+{% block title %}{{page_title}}{% endblock %}
 
 {% block stylesheets %}
-    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap/dataTables.bootstrap.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/rss/homepage.css') }}"/>
 {% endblock %}
 
 {% block body %}
     <div class="container">
-        <h2 class="text-center">Data RSS</h2>
-        <table id="example" class="table table-striped table-bordered" cellspacing="0" width="100%">
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Link</th>
-                    <th>Guid</th>
-                    <th>Category</th>
-                    <th>Guid</th>
-                    <th>Description</th>
-                    <th>Comment</th>
-                    <th width="150">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Name</td>
-                    <td>Position</td>
-                    <td>Office</td>
-                    <td>Extn.</td>
-                    <td>Start date</td>
-                    <td>Salary</td>
-                    <td>Salary</td>
-                    <td>
-                        <button type="button" class="btn btn-primary">Update</button>
-                        <button type="button" class="btn btn-danger">Delete</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Name</td>
-                    <td>Position</td>
-                    <td>Office</td>
-                    <td>Extn.</td>
-                    <td>Start date</td>
-                    <td>Salary</td>
-                     <td>Salary</td>
-                    <td>
-                        <button type="button" class="btn btn-primary">Update</button>
-                        <button type="button" class="btn btn-danger">Delete</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Name</td>
-                    <td>Position</td>
-                    <td>Office</td>
-                    <td>Extn.</td>
-                    <td>Start date</td>
-                    <td>Salary</td>
-                    <td>Salary</td>
-                    <td>
-                        <button type="button" class="btn btn-primary">Update</button>
-                        <button type="button" class="btn btn-danger">Delete</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-xs-12">
+               <div class="page-header text-center"><h2>List RSS Data</h2></div>
+                {# top pagination #}
+                <div class="row dt-head-info">
+                    <div class="col-lg-5">
+                    {% if list_item.getTotalItemCount > 0 %}
+                        Showing {{list_item.count}} of total {{list_item.getTotalItemCount}} records
+                    {% endif %}
+                    </div>
+                    <div class="col-lg-7">
+                        <form action="{{ path('rss_list') }}" method="get">
+                            <label for="filter">Category</label>
+                            <input name="filter" class="form-control" value="{{ list_item.params.filter ?? "" }}" type="text">
+                        </form>
+                    </div>
+                </div>
+            <div>
+            </div>
+                {# showing data #}
+                <table id="data-item" class="table table-striped table-bordered table-rss" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Title</th>
+                            <th>Category</th>
+                            <th width="100">Guid</th>
+                            <th width="150">Public date</th>
+                            <th>Description</th>
+                            <th>Comment</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                {% if list_item is empty %}
+                        <tr><td colspan="7" rowspan="" class="text-center">No records available</td></tr> 
+                {% else %}
+                    {% for item in list_item %}
+                        <tr>
+                            <td>{{ item.id }}</td>
+                            <td>
+                                <div class="crop" data-toggle="tooltip" title="{{ item.title }}">
+                                    <a href="{{ item.link }}" target="_blank">{{ item.title }}</a>
+                                </div>
+                            </td>
+                            <td><div class="crop" data-toggle="tooltip" title="{{ item.category }}">{{ item.category }}</div></td>
+                            <td><div class="crop">{{ item.guid }}</div></td>
+                            <td>{{ item.pub_date|date('d/m/Y H:i:s')}}</td>
+                            <td>
+                                <a href="#" class="show-detail" name="Detailed description">click here...</a>
+                                <div class="hide detail-content">{{ item.description }}</div>
+                            </td>
+                            <td>
+                            {% if item.comment != '' %}
+                                <a href="#" class="show-detail" name="Detailed comment">click here...</a>
+                                <div class="hide detail-content">{{ item.comment }}</div>
+                            {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                {% endif %}
+                </table>
+                {# pagination info #}
+                <div class="navigation">
+                    {{ knp_pagination_render(list_item) }}
+                </div>
+                {# modal #}
+                <div id="modal-detail" class="modal fade" role="dialog">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">
+                                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                                </button>
+                                <h4 class="modal-title"></h4>
+                            </div>
+                            <div class="modal-body"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>{# column #}
+        </div>{# row #}
+    </div>{# container #}
 {% endblock %}
 
 {% block javascripts %}
-    <script type="text/javascript" language="javascript" src="https://code.jquery.com/jquery-1.12.4.js">
-    </script>
-    <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js">
-    </script>
-    <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap.min.js">
-    </script>
-
-    </script>
+    <script type="text/javascript" src="{{asset('js/bootstrap/bootstrap.min.js')}}"></script>
+    <script type="text/javascript" src="{{asset('js/rss/homepage.js') }}"></script>
     <script type="text/javascript">
-        var table = $('#example').DataTable({
-            "searching": false,
-            "lengthChange": false,
-            "order": [],
-            "columnDefs": [
-                {
-                    "orderable": false,
-                    targets: [0,1,2,4,5,6,7]
-                }
-            ]
-        });
+        var objRss = new HandlingRss();
+        objRss.init();
     </script>
 {% endblock javascripts %}

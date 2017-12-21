@@ -1,23 +1,23 @@
 <?php
 namespace AppBundle\Command;
 
-Use AppBundle\Entity\Feed;
-use AppBundle\Service\Api\RssApi;
-use AppBundle\Utils\MysqlDB;
 use AppBundle\Utils\Utils;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
-use Psr\Log\LoggerInterface;
-
-use Acme\MyDependency;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class RssCommand extends ContainerAwareCommand
 {
 
     use Utils;
 
+    /**
+     * Object writing log
+     *
+     * @var object
+     */
     protected $logger;
 
     public function __construct(LoggerInterface $logger)
@@ -36,7 +36,7 @@ class RssCommand extends ContainerAwareCommand
         $this
         ->setName('grab-item')
         ->setDescription('Grab items from given urls')
-        ->addArgument('urls', InputArgument::REQUIRED, 'The API urls need to get item data');
+        ->addArgument('urls', InputArgument::REQUIRED, 'The feed urls need to get item data');
     }
 
     /**
@@ -48,21 +48,28 @@ class RssCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // Writing log command
-        $this->logger->info('Using command function', [
-            'category' => '8bit_trial.RssCommand.execute',
+
+        $output->writeln('Processing data...');
+
+        $this->logger->debug('Using command function', [
+            'category'   => 'AppBundle.Command.RssCommand.execute',
             'parameters' => $input->getArguments()
         ]);
-        $urls = $this->filterURL($input->getArgument('urls'));
+
+        $objFeed = $this->getContainer()->get('GetFeed');
+        $urls        = $this->filterURL($input->getArgument('urls'));
+        $mgs         = '<info>Congratulation, get data successfully!</>';
+
         if (empty($urls)) {
-            $message = '<comment>Please input an valid URL!</>';
+            $mgs = '<comment>Please input an valid URL!</>';
+        } else if (!$objFeed->getDataFromURL($urls)) {
+            $mgs = '<error>Get data failed, please try it again!</>';
         }
-        $message = $this->handleAPI($urls) ? '<info>Congratulation, get data successfully!</>'
-                    : "<error>Get data failed, please try it again!</>";
+
         $output->writeln([
-            "<info>==================================================================</>",
-            $message,
-            '<info>==================================================================</>',
+            "<info>------------------------------------------------------------------</>",
+            $mgs,
+            '<info>------------------------------------------------------------------</>',
         ]);
     }
 
@@ -83,33 +90,4 @@ class RssCommand extends ContainerAwareCommand
         return $urls;
     }
 
-    /**
-     * Handling send request and store data
-     *
-     * @param  array     $api the array API
-     * @return boolean   true if the processing is successful else return false 
-     */
-    protected function handleAPI($api)
-    {
-        // Get item data from API
-        $apiRss = new RssApi();
-        $apiRss->sendRequest($api);
-        $itemData = $apiRss->getItemData();
-        if (empty($itemData)) {
-            return false;
-        }
-        // Store data into DB
-        $feedEntity  = new Feed();
-        $mysql  = new MysqlDB(
-            $this->getContainer()->getParameter('database_name'), 
-            $this->getContainer()->getParameter('database_user'),
-            $this->getContainer()->getParameter('database_password'),
-            $this->getContainer()->getParameter('database_host')
-        );
-        return $mysql->insertMulti(
-            $feedEntity->getTableName(),
-            $feedEntity->getListColumnName(),
-            $itemData
-        );
-    }
 }

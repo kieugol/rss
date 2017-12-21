@@ -1,0 +1,38 @@
+.close {
+    float: right;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #000;
+    text-shadow: 0 1px 0 #fff;
+    opacity: .5;
+}
+.crop { 
+    overflow:hidden; 
+    white-space:nowrap; 
+    text-overflow:ellipsis;
+    width:230px; 
+}
+.modal-body{
+    max-height: 500px;
+    overflow-y: scroll;
+}
+.modal-header{
+    background: #e5e5e5;
+}
+.table-item{
+    margin-bottom: 0;
+}
+.dt-head-info {
+    margin-bottom: 10px;
+}
+.dt-head-info form{
+    text-align: right;
+}
+.dt-head-info form>input {
+    max-width: 250px;
+    display: inline-block;
+}
+.table-rss{
+    margin-bottom: 0px;
+}

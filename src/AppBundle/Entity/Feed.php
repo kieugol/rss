@@ -2,7 +2,6 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity
@@ -35,7 +34,7 @@ class Feed
     /**
      * @ORM\Column(type="datetime")
      */
-    private $pub_date;
+    public $pub_date;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -135,19 +134,19 @@ class Feed
     /**
      * @return mixed
      */
-    public function getGuid($guid)
+    public function getGuid()
     {
-        return $this->link;
+        return $this->guid;
     }
 
     /**
-     * @param mixed $link
+     * @param mixed $guid
      *
      * @return self
      */
     public function setGuid($guid)
     {
-        $this->link = $link;
+        $this->guid = $guid;
 
         return $this;
     }
@@ -210,53 +209,5 @@ class Feed
         $this->comment = $comment;
 
         return $this;
-    }
-
-    /**
-     * [getListColumnName description]
-     * @return [type] [description]
-     */
-    public function getListColumnName()
-    {
-        return [
-            'title',
-            'description',
-            'link',
-            'guid',
-            'category',
-            'comment',
-            'pub_date'
-        ];
-    }
-
-    /**
-     * Get table name
-     *
-     * @return string table name
-     */
-    public function getTableName()
-    {
-        return 'feed';
-    }
-
-    /**
-     * [insert description]
-     * 
-     * @param  [type] $arrData [description]
-     * @return [type]          [description]
-     */
-    public function insert($arrData) 
-    {
-        
-    }
-
-    public function update($arrData) 
-    {
-        
-    }
-
-    public function delete($arrData) 
-    {
-        
     }
 }

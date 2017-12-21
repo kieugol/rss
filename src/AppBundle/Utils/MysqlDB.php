@@ -9,16 +9,15 @@ class MysqlDB
 
     private $sql;
     private $mysql;
-    private $result;
     private $database_name;
 
     /**
      * Database() constructor
      *
-     * @param string $database_name
-     * @param string $username
-     * @param string $password
-     * @param string $host
+     * @param string  $database_name  database name
+     * @param string  $username       user name
+     * @param string  $password       passsword
+     * @param string  $host           ip/hostname
      * @throws Exception
      */
     function __construct($database_name, $username, $password, $host = 'localhost')
@@ -33,17 +32,6 @@ class MysqlDB
     }
 
     /**
-     * Helper for throwing exceptions
-     *
-     * @param $error
-     * @throws Exception
-     */
-    private function _error($error)
-    {
-        throw new \Exception('Database error: ' . $error);
-    }
-
-    /**
      * Get last executed query
      *
      * @return string|null
@@ -54,18 +42,16 @@ class MysqlDB
     }
 
     /**
-     * Insert a row in a table
+     * Insert multiple rows into DB
      *
-     * @param $table
-     * @param array $fields
-     * @param bool|false $appendix
-     * @param bool|false $ret
-     * @return bool|Database
-     * @throws Exception
+     * @param  string   $table_name    the table name
+     * @param  array    $column_names  array column name will insert data
+     * @param  array    $rows          array rows need to insert
+     * @param  boolean  $escape        default escape string
+     * @return boolean                 true if it's successful, otherwise is false
      */
     function insertMulti($table_name, $column_names, $rows, $escape = true)
     {
-        $this->result = null;
         $this->sql = null;
 
         //Build a list of column names
@@ -86,21 +72,17 @@ class MysqlDB
         // Collapse all the rows
         $values = "(" . implode( '),(', $rows ) . ")";
 
+        // Execute query insert
         $this->sql = "INSERT INTO $table_name ( $columns ) VALUES $values";
-        $this->result = mysqli_query($this->mysql, $this->sql);
-        if (mysqli_error($this->mysql) != '') {
-            $this->_error(mysqli_error($this->mysql));
-            $this->result = null;
-            return false;
-        } else {
-            return true;
-        }
+
+        return mysqli_query($this->mysql, $this->sql);
     }
 
     /**
-     * [escapeValue description]
-     * @param  [type] &$value [description]
-     * @return [type]         [description]
+     * Escape the value to string
+     *
+     * @param  string  &$value  the value will be escaped
+     * @return void
      */
     function escapeValue(&$value)
     {
@@ -110,9 +92,10 @@ class MysqlDB
     }
 
     /**
-     * [prepareColumnName description]
-     * @param  [type] $name [description]
-     * @return [type]       [description]
+     * Building column name
+     *
+     * @param  string  $name  the name column
+     * @return void
      */
     function prepareColumnName(&$name)
     {
@@ -124,7 +107,7 @@ class MysqlDB
      *
      * @return string
      */
-    public function error()
+    public function getError()
     {
         return mysqli_error($this->mysql);
     }

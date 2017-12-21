@@ -3,10 +3,15 @@
     <head>
         <meta charset="UTF-8" />
         <title>{% block title %}{% endblock %}</title>
+        <link rel="stylesheet" type="text/css" href="{{ asset('css/style.css') }}"/>
+        <link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap/bootstrap.min.css')}}">
         {% block stylesheets %}{% endblock %}
     </head>
     <body>
+        {{ include('common/header.html.twig', sandboxed = true) }}
         {% block body %}{% endblock %}
+        {{ include('common/footer.html.twig', sandboxed = true) }}
     </body>
+        <script type="text/javascript" language="javascript" src="{{asset('js/jquery-1.11.1.min.js')}}"></script>
         {% block javascripts %}{% endblock %} 
 </html>

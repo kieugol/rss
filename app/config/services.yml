@@ -28,3 +28,11 @@ services:
         resource: '../../src/AppBundle/Controller'
         public: true
         tags: ['controller.service_arguments']
+
+    # The namespace with the name of the class that contain our service
+    GetFeed:
+        class: AppBundle\Service\FeedServices
+        public: true
+        autowire: true
+        autoconfigure: true
+        arguments: [ "@doctrine.orm.entity_manager" , "@service_container" ] 
